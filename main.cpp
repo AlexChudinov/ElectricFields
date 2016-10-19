@@ -32,13 +32,13 @@ int main(int argc, char *argv[])
         {1.,1.,0.},  //9
         {1.,-1.,0.}, //10
         {-1.,1.,0.}, //11
-        {0.,1.,1.} //12
+        {0.,1.,-1.} //12
     };
 
     quad_function_matrix<double> qm(pts);
 
     std::cout << pts << std::endl;
     std::cout << qm.quad_matrix_ << std::endl;
-
+    std::cout << math::det(qm.quad_matrix_) << std::endl;
     return a.exec();
 }
