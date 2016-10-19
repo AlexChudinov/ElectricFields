@@ -10,3 +10,8 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp
+
+INCLUDEPATH += C:\Users\Luba\Desktop\BarnesHut
+
+HEADERS += \
+    quad_3d_fun.h
