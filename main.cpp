@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <quad_3d_fun.h>
+#include <graph.h>
 #include <iostream>
 
 int main(int argc, char *argv[])
@@ -44,6 +45,10 @@ int main(int argc, char *argv[])
     matrix4x4 m1{{1.,0.,0.,0.},{0.,1.,0.,0.},{0.,0.,2.,0.},{0.,0.,0.,1}};
     std::cout << m1 << std::endl;
     std::cout << math::det(m1) << std::endl;
+
+    data_structs::graph<unsigned long> gr;
+
+
 
     return a.exec();
 }
