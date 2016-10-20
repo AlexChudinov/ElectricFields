@@ -15,4 +15,5 @@ INCLUDEPATH += C:\Users\Luba\Desktop\BarnesHut
 
 HEADERS += \
     quad_3d_fun.h \
-    graph.h
+    graph.h \
+    ansys_mesh_load.h

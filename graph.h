@@ -27,7 +27,7 @@ struct graph
         mesh_connectivity_type::const_iterator cit1 = mesh_connectivity_.begin();
         mesh_connectivity_type::const_iterator cit2 = mesh_connectivity_.end();
 
-        if(max >= mesh_connectivity.size())
+        if(max >= mesh_connectivity_.size())
         {
             mesh_connectivity_.resize(max + 1);
             mesh_connectivity_[max].push_back(min);
