@@ -14,4 +14,5 @@ SOURCES += main.cpp
 INCLUDEPATH += C:\Users\Luba\Desktop\BarnesHut
 
 HEADERS += \
-    quad_3d_fun.h
+    quad_3d_fun.h \
+    graph.h
