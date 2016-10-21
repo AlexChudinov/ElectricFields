@@ -44,17 +44,17 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
     size_t elems_number;
     std::string name;
 
-    //std::getline(in,name); //Read word "Coordinates"
-    in >> name;
+    std::getline(in,name); //Read word "Coordinates"
     in >> elems_number;
     typename mesh_geometry::node_positions nodes(elems_number);
     typename mesh_geometry::node_positions::iterator it = nodes.begin();
     for(; it != nodes.end(); ++it)
     {
         typename mesh_geometry::vector3f& node = *it;
-        in >> node[0] >> node[1] >> node[2];
-        node -= 1.0f;
+        in >> elems_number >> node[0] >> node[1] >> node[2];
     }
+    std::getline(in,name);
+
     typename mesh_geometry::graph gr;
 
     //Read tetrahedrals
@@ -67,6 +67,7 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
         vertices -= 1u;
         add_tetrahedra(gr,vertices);
     }
+    std::getline(in,name);
 
     //Read pyramids
     std::getline(in,name);
@@ -78,6 +79,7 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
         vertices -= 1u;
         add_pyramid(gr,vertices);
     }
+    std::getline(in,name);
 
     //Read wedges
     std::getline(in,name);
@@ -89,6 +91,7 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
         vertices -= 1u;
         add_wedge(gr,vertices);
     }
+    std::getline(in,name);
 
     //Read hexahedrals
     std::getline(in,name);

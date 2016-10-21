@@ -12,7 +12,7 @@ TEMPLATE = app
 SOURCES += main.cpp \
     ansys_mesh_export.cpp
 
-INCLUDEPATH += C:\Users\Luba\Desktop\BarnesHut
+INCLUDEPATH += C:\Proj_22022016\BarnesHut
 
 HEADERS += \
     graph.h \
