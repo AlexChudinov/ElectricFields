@@ -1,10 +1,5 @@
 #include <ansys_mesh_export.h>
 
-void parse_ansys_mesh(std::istream &in)
-{
-
-}
-
 void add_tetrahedra(graph &g, const vector4ui &vertices)
 {
     g.add_connection(vertices[0], vertices[1]);

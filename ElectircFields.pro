@@ -15,6 +15,6 @@ SOURCES += main.cpp \
 INCLUDEPATH += C:\Users\Luba\Desktop\BarnesHut
 
 HEADERS += \
-    quad_3d_fun.h \
     graph.h \
-    ansys_mesh_export.h
+    ansys_mesh_export.h \
+    mesh_geometry.h

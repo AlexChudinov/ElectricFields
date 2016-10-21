@@ -74,6 +74,10 @@ public:
         return connectivity_[node_label];
     }
 
+    /**
+     * Get number of nodes
+     */
+    size_t size() const { return connectivity_.size(); }
 };
 
 }
