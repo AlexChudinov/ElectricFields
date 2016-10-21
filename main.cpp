@@ -51,7 +51,5 @@ int main(int argc, char *argv[])
     gr.add_connection(0,1);
     gr.add_connection(0,2);
 
-    std::cout << gr.mesh_connectivity_[0][0] << std::endl;
-
     return a.exec();
 }

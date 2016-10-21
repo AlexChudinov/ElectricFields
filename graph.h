@@ -15,50 +15,65 @@ using std::vector;
 template<typename label>
 struct graph
 {
-    using mesh_connectivity_type = std::vector<std::vector<label>>;
-    mesh_connectivity_type mesh_connectivity_;
+    using label_vector_type = std::vector<label>;
+    using connectivity_type = std::vector<label_vector_type>;
 
+    connectivity_type connectivity_;
+
+public:
+
+    /**
+     * Creates empty graph
+     */
     graph(){}
 
+    /**
+     * Adds new connection into graph, node labels go in ascending order
+     */
     void add_connection(label i, label j)
     {
         label max = std::max(i, j);
         label min = std::min(i, j);
-        mesh_connectivity_type::const_iterator cit1 = mesh_connectivity_.begin();
-        mesh_connectivity_type::const_iterator cit2 = mesh_connectivity_.end();
 
-        if(max >= mesh_connectivity_.size())
+        if(max >= connectivity_.size())
         {
-            mesh_connectivity_.resize(max + 1);
-            mesh_connectivity_[max].push_back(min);
-            mesh_connectivity_[min].push_back(max);
+            connectivity_.resize(max + 1);
+            connectivity_[max].push_back(min);
+            connectivity_[min].push_back(max);
         }
         else
         {
-            std::vector<label>::const_iterator cit1 = mesh_connectivity_[max].begin();
-            std::vector<label>::const_iterator cit2 = mesh_connectivity_[max].end();
-            std::vector<label>::const_iterator cit;
+            typename label_vector_type::const_iterator cit1 = connectivity_[max].cbegin();
+            typename label_vector_type::const_iterator cit2 = connectivity_[max].cend();
+            typename label_vector_type::const_iterator cit;
             if((cit = std::lower_bound(cit1, cit2, min)) != cit2)
             {
-                if(*cit != min) mesh_connectivity_[max].insert(cit, min);
+                if(*cit != min)
+                {
+                    connectivity_[max].insert(cit, min);
+                    cit1 = connectivity_[min].cbegin();
+                    cit2 = connectivity_[min].cend();
+                    connectivity_[min].insert(std::lower_bound(cit1, cit2, max), max);
+                }
             }
             else
             {
-                mesh_connectivity_[max].push_back(min);
-            }
-
-            cit1 = mesh_connectivity_[min].begin();
-            cit2 = mesh_connectivity_[min].end();
-            if((cit = std::lower_bound(cit1, cit2, max)) != cit2)
-            {
-                if(*cit != max) mesh_connectivity_[min].insert(cit, max);
-            }
-            else
-            {
-                mesh_connectivity_[min].push_back(max);
+                connectivity_[max].push_back(min);
+                cit1 = connectivity_[min].cbegin();
+                cit2 = connectivity_[min].cend();
+                connectivity_[min].insert(std::lower_bound(cit1, cit2, max), max);
             }
         }
     }
+
+    /**
+     * Get neighbour of the node
+     */
+    const label_vector_type& get_node_neighbour(label node_label) const
+    {
+        return connectivity_[node_label];
+    }
+
 };
 
 }
