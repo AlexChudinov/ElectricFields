@@ -16,6 +16,15 @@ public:
     using vector3f       = math::vector_c<Float, 3>;
     using node_positions = std::vector<vector3f>;
 
+    /**
+     * Type of a boundary condition
+     */
+    enum BOUNDARY_REGION_TYPE
+    {
+        FIXED_VAL = 0x00,
+        ZERO_GRAD = 0x01
+    };
+
 private:
     graph mesh_connectivity_;
     node_positions node_positions_;

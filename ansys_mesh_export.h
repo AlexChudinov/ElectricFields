@@ -37,14 +37,20 @@ void add_hexahedra(graph& g, const vector8ui& vertices);
 /**
  * Loads ANSYS mesh from a file
  */
-template<typename Float, typename label>
-mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
+template
+<typename Float,
+ typename label,
+ typename Stream,
+ typename SkipLine>
+mesh_geometry<Float, label> parse_ansys_mesh
+(
+        Stream &in,
+        SkipLine skip_line)
 {
     using mesh_geometry = mesh_geometry<Float, label>;
     size_t elems_number;
-    std::string name;
 
-    std::getline(in,name); //Read word "Coordinates"
+    skip_line(in); //Read word "Coordinates"
     in >> elems_number;
     typename mesh_geometry::node_positions nodes(elems_number);
     typename mesh_geometry::node_positions::iterator it = nodes.begin();
@@ -53,12 +59,12 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
         typename mesh_geometry::vector3f& node = *it;
         in >> elems_number >> node[0] >> node[1] >> node[2];
     }
-    std::getline(in,name);
+    skip_line(in);
 
     typename mesh_geometry::graph gr;
 
     //Read tetrahedrals
-    std::getline(in,name);
+    skip_line(in);
     in >> elems_number;
     for(size_t i = 0; i < elems_number; ++i)
     {
@@ -67,10 +73,10 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
         vertices -= 1u;
         add_tetrahedra(gr,vertices);
     }
-    std::getline(in,name);
+    skip_line(in);
 
     //Read pyramids
-    std::getline(in,name);
+    skip_line(in);
     in >> elems_number;
     for(size_t i = 0; i < elems_number; ++i)
     {
@@ -79,10 +85,10 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
         vertices -= 1u;
         add_pyramid(gr,vertices);
     }
-    std::getline(in,name);
+    skip_line(in);
 
     //Read wedges
-    std::getline(in,name);
+    skip_line(in);
     in >> elems_number;
     for(size_t i = 0; i < elems_number; ++i)
     {
@@ -91,10 +97,10 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
         vertices -= 1u;
         add_wedge(gr,vertices);
     }
-    std::getline(in,name);
+    skip_line(in);
 
     //Read hexahedrals
-    std::getline(in,name);
+    skip_line(in);
     in >> elems_number;
     for(size_t i = 0; i < elems_number; ++i)
     {
@@ -108,6 +114,22 @@ mesh_geometry<Float, label> parse_ansys_mesh(std::istream &in)
     }
 
     return mesh_geometry(gr, nodes);
+}
+
+/**
+ * Loads mesh boundary regions from a file
+ */
+template
+<typename Float,
+ typename label,
+ typename Stream,
+ typename SkipLine>
+mesh_geometry<Float, label> parse_ansys_boundary_mesh
+(
+        Stream &in,
+        SkipLine skip_line)
+{
+
 }
 
 #endif // ANSYS_MESH_LOAD_H
