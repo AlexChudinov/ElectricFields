@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
 
     MainWindow main_window;
     main_window.show();
+
     /*std::ifstream in;
     in.open("C:\\Proj_22022016\\ElectricFields\\test_quad_flat.geom");
 
