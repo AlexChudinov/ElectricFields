@@ -6,20 +6,14 @@ TARGET = ElectircFields
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    ansys_mesh_export.cpp \
-    main_window.cpp \
-    show_mesh_data.cpp
+    main_window.cpp
 
-INCLUDEPATH += C:\Proj_22022016\BarnesHut
+INCLUDEPATH += C:\Users\Luba\Desktop\BarnesHut #Path to matrix and vector headers
 
-HEADERS += \
-    graph.h \
-    ansys_mesh_export.h \
-    mesh_geometry.h \
-    main_window.h \
-    app_data.h \
-    show_mesh_data.h
+HEADERS += main_window.h \
+    app_data.h
+
+include(display_mesh/display_mesh.pri)
+include(mesh_math/mesh_math.pri)
 
 RESOURCES += resources.qrc
-
-DISTFILES +=

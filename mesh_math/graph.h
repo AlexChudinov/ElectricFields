@@ -3,9 +3,10 @@
 
 #include <vector>
 #include <algorithm>
+#include <utility>
 
 /**
- * Graph to keep mesh connectivity information
+ * Unordered graph to keep mesh connectivity information
  */
 
 namespace data_structs {
@@ -17,6 +18,7 @@ struct graph
 {
     using label_vector_type = std::vector<label>;
     using connectivity_type = std::vector<label_vector_type>;
+    using connection_type   = std::pair<label, label>;
 
     connectivity_type connectivity_;
 
@@ -28,7 +30,8 @@ public:
     graph(){}
 
     /**
-     * Adds new connection into graph, node labels go in ascending order
+     * Adds new connection into the unordered graph,
+     * Note: node labels go in ascending order
      */
     void add_connection(label i, label j)
     {
@@ -78,6 +81,28 @@ public:
      * Get number of nodes
      */
     size_t size() const { return connectivity_.size(); }
+
+    /**
+     * Returns a total number of connections
+     */
+    size_t connections_number() const
+    {
+        size_t connestions = 0;
+        for(const label_vector_type& lv : connectivity_)
+            connestions += lv.size();
+        return connestions/2;
+    }
+
+    /**
+     * Iterates over unique connections passing corresponding labels into the observer functor
+     */
+    template<typename Observer>
+    void iterate_over_unique_connections(Observer observer) const
+    {
+        for(size_t i = 0; i != connectivity_.size(); ++i)
+            for(size_t j = 0; j != connectivity_[i].size(); ++j)
+                if(connectivity_[i][j] > i) observer(i, connectivity_[i][j]);
+    }
 };
 
 }
