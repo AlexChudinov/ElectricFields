@@ -4,8 +4,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextStream>
-#include <QVBoxLayout>
-#include <QTableWidget>
+#include <QSplitter>
+#include <QBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     :
@@ -13,15 +13,12 @@ MainWindow::MainWindow(QWidget *parent)
       tool_bar_(new QToolBar(this)),
       file_open_action_(new QAction(QIcon(":/file_open_icon"),QObject::tr("Open file"), parent)),
       app_data_(),
-      central_widget_(new QWidget(this)),
-      window_layout_(new QVBoxLayout(this)),
-      boundary_regions_(new QTableWidget(this))
+      splitter_(new QSplitter(this))
 {
     this->addToolBar(tool_bar_);
     tool_bar_->addAction(file_open_action_);
-    this->setCentralWidget(central_widget_);
-    central_widget_->setLayout(window_layout_);
-    window_layout_->addWidget(boundary_regions_);
+
+    this->setCentralWidget(splitter_);
 
     //Do connections
     connect(file_open_action_,SIGNAL(triggered()),

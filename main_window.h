@@ -6,6 +6,7 @@
 
 class QVBoxLayout;
 class QTableWidget;
+class QSplitter;
 
 class MainWindow : public QMainWindow
 {
@@ -29,12 +30,7 @@ private:
      */
     app_data app_data_;
 
-    /**
-     * Puts widgets on window
-     */
-    QWidget* central_widget_;
-    QVBoxLayout* window_layout_;
-    QTableWidget* boundary_regions_;
+    QSplitter* splitter_;
 };
 
 #endif // MAIN_WINDOW_H

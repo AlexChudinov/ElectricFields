@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file alias="file_open_icon">Pictures/file_open_icon.png</file>
+        <file>vshader.glsl</file>
     </qresource>
 </RCC>
