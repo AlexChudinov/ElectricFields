@@ -4,7 +4,8 @@
 
 mesh_geometry_engine::mesh_geometry_engine(const mesh_geom &geom)
     : geom_(geom),
-      array_buf_(new QOpenGLBuffer())
+      array_buf_(new QOpenGLBuffer()),
+      connections_number_(0)
 {
     this->initializeOpenGLFunctions();
     array_buf_->create();
@@ -23,12 +24,15 @@ void mesh_geometry_engine::draw_mesh_geometry(QOpenGLShaderProgram *program)
     int attr_location = program->attributeLocation("vertex_position");
     program->enableAttributeArray(attr_location);
     program->setAttributeBuffer(attr_location, GL_FLOAT, 0, 3);
-    glDrawArrays(GL_LINES, 0, 3);
+    glDrawArrays(GL_LINES, 0, connections_number_);
 }
 
-void mesh_geometry_engine::init_mesh_geometry_() const
+void mesh_geometry_engine::init_mesh_geometry_()
 {
     mesh_geom::node_positions connections = geom_.mesh_connections();
+    connections_number_ = connections.size();
+    box_ = geom_.containing_box();
+    array_buf_->bind();
     array_buf_->allocate
             (
                 connections.data(),
@@ -56,6 +60,7 @@ void gl_mesh_widget::initializeGL()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     program_->addShaderFromSourceFile(QOpenGLShader::Vertex,":/vshader.glsl");
+    program_->addShaderFromSourceFile(QOpenGLShader::Fragment,":/fshader.frag");
     program_->link();
     program_->bind();
 
@@ -79,14 +84,20 @@ void gl_mesh_widget::resizeGL(int w, int h)
 
 void gl_mesh_widget::paintGL()
 {
-    QMatrix4x4 matrix;
-    matrix.setToIdentity();
-    matrix.translate(0.0, 0.0, -4.0);
-
-    program_->setUniformValue("mvp_matrix", projection_matrix_*matrix);
-
     if(geometry_)
     {
+        QMatrix4x4 matrix;
+        matrix.setToIdentity();
+        matrix.translate(0.0, 0.0, -3.0);
+        bounding_box_type box3d = geometry_->box();
+        float x_scale = box3d.second[0] - box3d.first[0];
+        float y_scale = box3d.second[1] - box3d.first[1];
+        float x0 = box3d.first[0] + x_scale/2.;
+        float y0 = box3d.first[1] + y_scale/2.;
+        matrix.scale(2.0/x_scale, 2.0/y_scale, 1.0);
+        matrix.translate(-x0, y0, 0.0);
+
+        program_->setUniformValue("mvp_matrix", projection_matrix_*matrix);
         geometry_->draw_mesh_geometry(program_);
     }
 }

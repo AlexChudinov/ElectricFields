@@ -8,7 +8,7 @@ TEMPLATE = app
 SOURCES += main.cpp \
     main_window.cpp
 
-INCLUDEPATH += C:\Users\Alex\BarnesHut #Path to matrix and vector headers
+INCLUDEPATH += C:\Proj_22022016\BarnesHut #Path to matrix and vector headers
 
 HEADERS += main_window.h \
     app_data.h

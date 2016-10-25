@@ -99,9 +99,14 @@ public:
     template<typename Observer>
     void iterate_over_unique_connections(Observer observer) const
     {
+        using label_vec_iter = typename label_vector_type::const_iterator;
         for(size_t i = 0; i != connectivity_.size(); ++i)
-            for(size_t j = 0; j != connectivity_[i].size(); ++j)
-                if(connectivity_[i][j] > i) observer(i, connectivity_[i][j]);
+        {
+            label_vec_iter first = connectivity_[i].cbegin();
+            label_vec_iter last = connectivity_[i].cend();
+            first = std::lower_bound(first, last, i);
+            for(; first != last; ++first) observer(i, *first);
+        }
     }
 };
 

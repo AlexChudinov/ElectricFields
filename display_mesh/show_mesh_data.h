@@ -10,7 +10,8 @@
 class QOpenGLBuffer;
 class QOpenGLShaderProgram;
 
-using mesh_geom = mesh_geometry<float, uint32_t>;
+using mesh_geom         = mesh_geometry<float, uint32_t>;
+using bounding_box_type = mesh_geom::box3D;
 
 class mesh_geometry_engine : public QOpenGLFunctions
 {
@@ -21,10 +22,16 @@ public:
     virtual ~mesh_geometry_engine();
 
     void draw_mesh_geometry(QOpenGLShaderProgram* program);
+
+    const bounding_box_type& box() { return box_; }
 private:
-    void init_mesh_geometry_() const;
+    void init_mesh_geometry_();
 
     QOpenGLBuffer* array_buf_;
+
+    size_t connections_number_;
+
+    bounding_box_type box_;
 };
 
 class gl_mesh_widget : public QOpenGLWidget, public QOpenGLFunctions
