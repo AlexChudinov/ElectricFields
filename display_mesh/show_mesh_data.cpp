@@ -4,7 +4,7 @@
 
 mesh_geometry_engine::mesh_geometry_engine(const mesh_geom &geom)
     : geom_(geom),
-      array_buf_(new QOpenGLBuffer)
+      array_buf_(new QOpenGLBuffer())
 {
     this->initializeOpenGLFunctions();
     array_buf_->create();
@@ -53,9 +53,9 @@ void gl_mesh_widget::initializeGL()
 {
     this->initializeOpenGLFunctions();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-    program_->addShaderFromSourceCode(QOpenGLShader::Vertex,":/vshader.glsl");
+    program_->addShaderFromSourceFile(QOpenGLShader::Vertex,":/vshader.glsl");
     program_->link();
     program_->bind();
 
@@ -64,15 +64,35 @@ void gl_mesh_widget::initializeGL()
 
 void gl_mesh_widget::resizeGL(int w, int h)
 {
+    // Calculate aspect ratio
+    qreal aspect = qreal(w) / qreal(h ? h : 1);
 
+    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
+    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+
+    // Reset projection
+    projection_matrix_.setToIdentity();
+
+    // Set perspective projection
+    projection_matrix_.perspective(fov, aspect, zNear, zFar);
 }
 
 void gl_mesh_widget::paintGL()
 {
+    QMatrix4x4 matrix;
+    matrix.setToIdentity();
+    matrix.translate(0.0, 0.0, -4.0);
 
+    program_->setUniformValue("mvp_matrix", projection_matrix_*matrix);
+
+    if(geometry_)
+    {
+        geometry_->draw_mesh_geometry(program_);
+    }
 }
 
 void gl_mesh_widget::set_mesh_pointer(const mesh_geom *geom)
 {
     geometry_ = new mesh_geometry_engine(*geom);
+    this->update();
 }

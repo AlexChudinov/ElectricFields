@@ -3,7 +3,9 @@
 
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
+#include <QMatrix4x4>
 #include "mesh_geometry.h"
+#include "show_mesh_data.h"
 
 class QOpenGLBuffer;
 class QOpenGLShaderProgram;
@@ -43,6 +45,8 @@ private:
     QOpenGLShaderProgram* program_;
 
     mesh_geometry_engine* geometry_;
+
+    QMatrix4x4 projection_matrix_;
 };
 
 #endif // SHOW_MESH_DATA_H

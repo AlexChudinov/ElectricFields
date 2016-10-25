@@ -2,6 +2,7 @@
 #define MAIN_WINDOW_H
 
 #include <QMainWindow>
+#include "show_mesh_data.h"
 #include <app_data.h>
 
 class QVBoxLayout;
@@ -15,6 +16,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget* parent = 0);
     ~MainWindow();
+
+signals:
+    void mesh_loaded(const mesh_geom* mesh);
 
 public slots:
     void open_file_action();

@@ -20,6 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setCentralWidget(splitter_);
 
+    gl_mesh_widget* gl_mesh_widget_ = new gl_mesh_widget(this);
+    connect(this, SIGNAL(mesh_loaded(const mesh_geom*)),
+            gl_mesh_widget_, SLOT(set_mesh_pointer(const mesh_geom*)));
+    splitter_->addWidget(gl_mesh_widget_);
+
     //Do connections
     connect(file_open_action_,SIGNAL(triggered()),
             this,SLOT(open_file_action()));
@@ -58,6 +63,7 @@ void MainWindow::open_file_action()
                          [](QTextStream& stream){stream.readLine();}
                      ));
             file.close();
+            emit mesh_loaded(app_data_.mesh_geometry_);
         }
     }
 }
