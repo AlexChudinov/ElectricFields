@@ -59,8 +59,8 @@ void gl_mesh_widget::initializeGL()
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-    program_->addShaderFromSourceFile(QOpenGLShader::Vertex,":/vshader.glsl");
-    program_->addShaderFromSourceFile(QOpenGLShader::Fragment,":/fshader.frag");
+    program_->addShaderFromSourceFile(QOpenGLShader::Vertex,":/vector_shader");
+    program_->addShaderFromSourceFile(QOpenGLShader::Fragment,":/fragment_shader");
     program_->link();
     program_->bind();
 

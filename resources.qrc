@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file alias="file_open_icon">Pictures/file_open_icon.png</file>
-        <file>vshader.glsl</file>
-        <file>fshader.frag</file>
+        <file alias="vector_shader">Shaders/vshader.glsl</file>
+        <file alias="fragment_shader">Shaders/fshader.frag</file>
     </qresource>
 </RCC>

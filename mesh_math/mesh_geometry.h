@@ -113,15 +113,16 @@ public:
         if(*(this->boundary_mesh_.lower_bound(name)) == name ) return false;
 
         //If the mesh is not fitted with the boundary
-        if(check_boundary(mesh)) return false;
+        if(this->check_boundary(mesh)) return false;
 
-        boundary_mesh_[name] = mesh;
+        this->boundary_mesh_[name] = mesh;
 
-        for(size_t i = 0; i < mesh.size(); ++i)
+        auto observer = [this,type](label node_label)
         {
-            node_types_[i] = type;
-            for(const label& l : mesh.get_node_neighbour(i));
-        }
+            this->node_types_[node_label] = type;
+        };
+
+        mesh.dfs_iterative(observer);
 
         return true;
     }
