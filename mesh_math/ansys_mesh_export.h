@@ -93,7 +93,7 @@ mesh_geometry<Float, label> parse_ansys_mesh
     for(size_t i = 0; i < elems_number; ++i)
     {
         vector6ui vertices;
-        in >> vertices[0] >> vertices[1] >> vertices[2] >> vertices[3] >> vertices[4] >> vertices[6];
+        in >> vertices[0] >> vertices[1] >> vertices[2] >> vertices[3] >> vertices[4] >> vertices[5];
         vertices -= 1u;
         add_wedge(gr,vertices);
     }
@@ -107,8 +107,8 @@ mesh_geometry<Float, label> parse_ansys_mesh
         vector8ui vertices;
         in >>
                 vertices[0] >> vertices[1] >> vertices[2] >>
-                vertices[3] >> vertices[4] >> vertices[6] >>
-                vertices[7] >> vertices[8];
+                vertices[3] >> vertices[4] >> vertices[5] >>
+                vertices[6] >> vertices[7];
         vertices -= 1u;
         add_hexahedra(gr,vertices);
     }

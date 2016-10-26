@@ -89,7 +89,11 @@ void gl_mesh_widget::paintGL()
         QMatrix4x4 matrix;
         matrix.setToIdentity();
         matrix.translate(0.0, 0.0, -3.0);
+
+        //Get mesh bounding box
         bounding_box_type box3d = geometry_->box();
+
+        //Get mesh scale factors and central pints
         float x_scale = box3d.second[0] - box3d.first[0];
         float y_scale = box3d.second[1] - box3d.first[1];
         float x0 = box3d.first[0] + x_scale/2.;
