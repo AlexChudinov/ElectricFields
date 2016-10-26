@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
+#include <stack>
 
 /**
  * Unordered graph to keep mesh connectivity information
@@ -14,7 +15,7 @@ namespace data_structs {
 using std::vector;
 
 template<typename label>
-struct graph
+class graph
 {
     using label_vector_type = std::vector<label>;
     using connectivity_type = std::vector<label_vector_type>;
@@ -106,6 +107,25 @@ public:
             label_vec_iter last = connectivity_[i].cend();
             first = std::lower_bound(first, last, i);
             for(; first != last; ++first) observer(i, *first);
+        }
+    }
+
+    /**
+     * Graph deep search itterative
+     */
+    template<typename Observer>
+    void dfs_iterative(Observer observer) const
+    {
+        std::vector<bool> visited(this->size(), false);
+        std::stack<label> dfs_stack;
+        dfs_stack.push(label(0));
+
+        while(!dfs_stack.empty())
+        {
+            label current_label = dfs_stack.top();
+            dfs_stack.pop();
+
+
         }
     }
 };

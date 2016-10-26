@@ -93,12 +93,12 @@ void gl_mesh_widget::paintGL()
         //Get mesh bounding box
         bounding_box_type box3d = geometry_->box();
 
-        //Get mesh scale factors and central pints
+        //Get mesh scale factors and central point
         float x_scale = box3d.second[0] - box3d.first[0];
         float y_scale = box3d.second[1] - box3d.first[1];
         float x0 = box3d.first[0] + x_scale/2.;
         float y0 = box3d.first[1] + y_scale/2.;
-        matrix.scale(2.0/x_scale, 2.0/y_scale, 1.0);
+        matrix.scale(4.0/x_scale, 2.0/y_scale, 1.0);
         matrix.translate(-x0, y0, 0.0);
 
         program_->setUniformValue("mvp_matrix", projection_matrix_*matrix);

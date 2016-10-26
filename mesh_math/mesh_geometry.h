@@ -5,6 +5,9 @@
 #include <vector>
 #include <vectortemplate.h>
 #include <utility>
+#include <map>
+
+template<typename Float, typename label> class mesh_geometry;
 
 /**
  * Mesh connectivity and node space positions
@@ -17,24 +20,31 @@ public:
     using vector3f       = math::vector_c<Float, 3>;
     using node_positions = std::vector<vector3f>;
     using box3D          = std::pair<vector3f, vector3f>;
+    using boundary_regions_list = std::map<std::string, graph>;
 
     /**
-     * Type of a boundary condition
+     *  Node types of a mesh
      */
-    enum BOUNDARY_REGION_TYPE
+    enum NODE_TYPE : uint8_t
     {
-        FIXED_VAL = 0x00,
-        ZERO_GRAD = 0x01
+        INNER_POINT = 0x00,
+        BOUNDARY_ZERO_GRADIENT = 0x01,
+        BOUNDARY_FIXED_VALUE = 0x02
     };
+    using node_types_list= std::vector<NODE_TYPE>;
 
-private:
+protected:
     graph mesh_connectivity_;
     node_positions node_positions_;
+    boundary_regions_list boundary_mesh_;
+    node_types_list node_types_;
 
 public:
     mesh_geometry(const graph& g, const node_positions& np)
-        : mesh_connectivity_(g), node_positions_(np)
-    { assert(mesh_connectivity_.size() == node_positions_.size()); }
+        : mesh_connectivity_(g),
+          node_positions_(np),
+          node_types_(np.size(), INNER_POINT)
+    { assert(g.size() == np.size()); }
 
     /**
      * Returns all mesh connections for OpenGL drawing with GL_LINES flag
@@ -54,6 +64,11 @@ public:
 
         return res;
     }
+
+    /**
+     * Returns a number of nodes in the mesh
+     */
+    size_t nodes_number() const { return node_positions_.size(); }
 
     /**
      * Returns minimal box that contains whole mesh
@@ -79,6 +94,36 @@ public:
         }
 
         return box3D({min_x, min_y, min_z}, {max_x, max_y, max_z});
+    }
+
+    /**
+     * Checks if the boundary could be attributed to the mesh
+     */
+    bool check_boundary(const graph& mesh) const
+    {
+        return mesh.size() == this->nodes_number();
+    }
+
+    /**
+     * Adds new boundary returns true if it is ok
+     */
+    bool add_boundary(const std::string& name, const graph& mesh, NODE_TYPE type = BOUNDARY_FIXED_VALUE)
+    {
+        //If the name already exists
+        if(*(this->boundary_mesh_.lower_bound(name)) == name ) return false;
+
+        //If the mesh is not fitted with the boundary
+        if(check_boundary(mesh)) return false;
+
+        boundary_mesh_[name] = mesh;
+
+        for(size_t i = 0; i < mesh.size(); ++i)
+        {
+            node_types_[i] = type;
+            for(const label& l : mesh.get_node_neighbour(i))
+        }
+
+        return true;
     }
 };
 
