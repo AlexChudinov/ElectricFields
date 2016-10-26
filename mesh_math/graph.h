@@ -122,10 +122,14 @@ public:
 
         while(!dfs_stack.empty())
         {
-            label current_label = dfs_stack.top();
-            dfs_stack.pop();
+            label current_label = dfs_stack.top(); dfs_stack.pop();
+            if(!visited[current_label])
+            {
+                observer(current_label);
+                visited[current_label] = true;
 
-
+                for(label l : this->get_node_neighbour(current_label)) dfs_stack.push(l);
+            }
         }
     }
 };

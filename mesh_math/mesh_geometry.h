@@ -120,7 +120,7 @@ public:
         for(size_t i = 0; i < mesh.size(); ++i)
         {
             node_types_[i] = type;
-            for(const label& l : mesh.get_node_neighbour(i))
+            for(const label& l : mesh.get_node_neighbour(i));
         }
 
         return true;

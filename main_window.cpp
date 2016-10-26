@@ -6,26 +6,33 @@
 #include <QTextStream>
 #include <QSplitter>
 #include <QBoxLayout>
+#include <QStatusBar>
+#include <QProgressBar>
 
 MainWindow::MainWindow(QWidget *parent)
     :
       QMainWindow(parent),
       tool_bar_(new QToolBar(this)),
-      file_open_action_(new QAction(QIcon(":/file_open_icon"),QObject::tr("Open file"), parent)),
+      status_bar_(new QStatusBar(this)),
+      file_open_action_(new QAction(QIcon(":/file_open_icon"),QObject::tr("Open file"), this)),
       app_data_(),
       splitter_(new QSplitter(this))
 {
+    //Set widgets and parameters
+    this->resize(600, 400);
     this->addToolBar(tool_bar_);
-    tool_bar_->addAction(file_open_action_);
-
     this->setCentralWidget(splitter_);
+    this->setStatusBar(status_bar_);
+
+    //Create tool bar actions
+    tool_bar_->addAction(file_open_action_);
 
     gl_mesh_widget* gl_mesh_widget_ = new gl_mesh_widget(this);
     connect(this, SIGNAL(mesh_loaded(const mesh_geom*)),
             gl_mesh_widget_, SLOT(set_mesh_pointer(const mesh_geom*)));
     splitter_->addWidget(gl_mesh_widget_);
 
-    //Do connections
+    //Connect file open action
     connect(file_open_action_,SIGNAL(triggered()),
             this,SLOT(open_file_action()));
 }
@@ -34,6 +41,11 @@ MainWindow::~MainWindow(){}
 
 void MainWindow::open_file_action()
 {
+    QProgressBar progress_bar_;
+    progress_bar_.setRange(0, 5);
+    progress_bar_.setFormat("File loading...");
+    status_bar_->addWidget(&progress_bar_);
+
     QString file_name = QFileDialog::getOpenFileName
             (
                 this,
@@ -55,15 +67,23 @@ void MainWindow::open_file_action()
         else
         {
             QTextStream stream(&file);
+            int progress = 1;
             app_data_.mesh_geometry_
                     = new app_data::mesh_geom
                     (parse_ansys_mesh<float, uint32_t>
                      (
                          stream,
-                         [](QTextStream& stream){stream.readLine();}
+                         [&progress_bar_, &progress](QTextStream& stream)
+            {
+                         QString name = stream.readLine();
+                         progress_bar_.setValue(progress++);
+                         progress_bar_.setFormat(name);
+            }
                      ));
             file.close();
             emit mesh_loaded(app_data_.mesh_geometry_);
         }
     }
+
+    status_bar_->removeWidget(&progress_bar_);
 }

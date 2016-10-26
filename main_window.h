@@ -19,12 +19,16 @@ public:
 
 signals:
     void mesh_loaded(const mesh_geom* mesh);
+    void status_widget(QWidget*);
+    void status_remove_widget();
 
 public slots:
     void open_file_action();
 
 private:
     QToolBar* tool_bar_;
+
+    QStatusBar* status_bar_;
 
     constexpr static const char* file_open_filters_ = "Ansys mesh: (*.geom)";
     QAction* file_open_action_;
