@@ -45,6 +45,7 @@ void MainWindow::open_file_action()
     progress_bar_.setRange(0, 5);
     progress_bar_.setTextVisible(true);
     progress_bar_.setFormat("File loading...");
+    progress_bar_.setAlignment(Qt::AlignCenter);
     status_bar_->addWidget(&progress_bar_);
 
     QString file_name = QFileDialog::getOpenFileName

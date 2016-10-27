@@ -16,20 +16,26 @@ template<typename Float, typename label>
 class mesh_geometry
 {
 public:
+    using string         = std::string;
     using graph          = data_structs::graph<label>;
     using vector3f       = math::vector_c<Float, 3>;
     using node_positions = std::vector<vector3f>;
     using box3D          = std::pair<vector3f, vector3f>;
-    using boundary_regions_list = std::map<std::string, graph>;
+    using boundary_regions_list = std::map<string, graph>;
+    using field          = std::vector<Float>;
+    using fields_list    = std::map<string, field>;
+    using field_entry    = std::pair<string, field>;
+    using boundary_entry = std::pair<string, graph>;
 
     /**
      *  Node types of a mesh
      */
     enum NODE_TYPE : uint8_t
     {
-        INNER_POINT = 0x00,
+        INNER_POINT            = 0x00,
         BOUNDARY_ZERO_GRADIENT = 0x01,
-        BOUNDARY_FIXED_VALUE = 0x02
+        BOUNDARY_FIXED_VALUE   = 0x02,
+        UNKNOWN                = 0xFF ///Some error case
     };
     using node_types_list= std::vector<NODE_TYPE>;
 
@@ -37,6 +43,7 @@ private:
     graph mesh_connectivity_;
     node_positions node_positions_;
     boundary_regions_list boundary_mesh_;
+    fields_list fields_;
     node_types_list node_types_;
 
 public:
@@ -68,7 +75,7 @@ public:
     /**
      * Returns a number of nodes in the mesh
      */
-    size_t nodes_number() const { return node_positions_.size(); }
+    inline size_t nodes_number() const { return node_positions_.size(); }
 
     /**
      * Returns minimal box that contains whole mesh
@@ -99,21 +106,28 @@ public:
     /**
      * Checks if the boundary could be attributed to the mesh
      */
-    bool check_boundary(const graph& mesh) const
-    {
-        return mesh.size() == this->nodes_number();
-    }
+    inline bool check_boundary(const graph& mesh) const
+    { return mesh.size() == this->nodes_number(); }
+    /**
+     * Checks if the mesh has a boundary with a such name
+     */
+    inline bool is_boundary(const string& name) const
+    { return boundary_mesh_.lower_bound(name) != boundary_mesh_.end(); }
+    /**
+     * Checks if the mesh contains field with a such name
+     */
+    inline bool is_field(const string& name) const
+    { return fields_.lower_bound(name) != boundary_mesh_.end(); }
 
     /**
      * Adds new boundary returns true if it is ok
      */
-    bool add_boundary(const std::string& name, const graph& mesh, NODE_TYPE type = BOUNDARY_FIXED_VALUE)
+    bool add_boundary(const string& name, const graph& mesh, NODE_TYPE type = BOUNDARY_FIXED_VALUE)
     {
-        //If the name already exists
-        if(*(this->boundary_mesh_.lower_bound(name)) == name ) return false;
-
+        //If the mesh already has this boundary
+        if(this->is_boundary(name)) return false;
         //If the mesh is not fitted with the boundary
-        if(this->check_boundary(mesh)) return false;
+        if(!(this->check_boundary(mesh))) return false;
 
         this->boundary_mesh_[name] = mesh;
 
@@ -125,6 +139,112 @@ public:
         mesh.dfs_iterative(observer);
 
         return true;
+    }
+
+    /**
+     * Sets boundary field value
+     */
+    bool set_boundary_val
+    (
+            const string& boundary_name,
+            const string& field_name,
+            const Float& val)
+    {
+        //If there is no such a boundary
+        if(!(this->is_boundary(boundary_name))) return false;
+
+        //If there is no such a field
+        if(!(this->is_field(field_name))) return false;
+
+        auto observer = [this, val, field_name](label node_label)
+        {
+            this->fields_[field_name][node_label] = val;
+        };
+
+        this->boundary_mesh_[boundary_name].dfs_iterative(observer);
+
+        return true;
+    }
+
+    /**
+     * Sets boundary type
+     */
+    bool set_boundary_type(const string& name, NODE_TYPE type)
+    {
+        if(!(this->is_boundary(name))) return false;
+
+        auto observer = [this, type](label node_label)
+        {
+            this->node_types_[node_label] = type;
+        };
+
+        this->boundary_mesh_[name].dfs_iterative(observer);
+
+        return true;
+    }
+    /**
+     * Gets boundary type
+     * Note: If nodes of the boundary contain different types the function returns UNKNOWN type
+     */
+    NODE_TYPE get_boundary_type(const string& name) const
+    {
+        if(!(this->is_boundary(name))) return UNKNOWN;
+
+        NODE_TYPE type;
+
+        this->boundary_mesh_.at(name).dfs_iterative([&type, this](label node_label)
+        {
+            if(node_label != 0 && type != this->node_types_[node_label])
+                type = UNKNOWN;
+            else type = this->node_types_[node_label];
+        });
+
+        return type;
+    }
+    /**
+     * Adds field entry to the mesh
+     */
+    bool add_field(const string& name, const field& f)
+    {
+        //Field already exists
+        if(this->is_field(name)) return false;
+        //Field is not corresponds to the mesh
+        if(this->node_positions_.size() != f.size()) return false;
+
+        field_ref(name) = f;
+        return true;
+    }
+
+    /**
+     * Iterates over the all boundaries
+     */
+    template<typename Observer>
+    void iterate_over_boundaries(Observer observer) const
+    {
+        for(const boundary_entry& b : this->boundary_mesh_)
+            observer(b);
+    }
+
+    /**
+     * Iterates over the all fields
+     */
+    template<typename Observer>
+    void iterate_over_fields(Observer observer) const
+    {
+        for(const field_entry& f : this->fields_)
+            observer(f);
+    }
+
+    /**
+     * Returns field refs
+     */
+    field& field_ref(const string& name)
+    {
+        return fields_.at(name);
+    }
+    const field& field_cref(const string& name) const
+    {
+        return fields_.at(name);
     }
 };
 

@@ -47,25 +47,16 @@ public:
         }
         else
         {
-            typename label_vector_type::const_iterator cit1 = connectivity_[max].cbegin();
-            typename label_vector_type::const_iterator cit2 = connectivity_[max].cend();
-            typename label_vector_type::const_iterator cit;
-            if((cit = std::lower_bound(cit1, cit2, min)) != cit2)
+            typename label_vector_type::const_iterator
+                    first_max = connectivity_[max].cbegin(),
+                    last_max  = connectivity_[max].cend(),
+                    first_min = connectivity_[min].cbegin(),
+                    last_min  = connectivity_[min].cend(),
+                    cit = std::lower_bound(first_max, last_max, min);
+            if(cit == last_max || *cit != min)
             {
-                if(*cit != min)
-                {
-                    connectivity_[max].insert(cit, min);
-                    cit1 = connectivity_[min].cbegin();
-                    cit2 = connectivity_[min].cend();
-                    connectivity_[min].insert(std::lower_bound(cit1, cit2, max), max);
-                }
-            }
-            else
-            {
-                connectivity_[max].push_back(min);
-                cit1 = connectivity_[min].cbegin();
-                cit2 = connectivity_[min].cend();
-                connectivity_[min].insert(std::lower_bound(cit1, cit2, max), max);
+                connectivity_[max].insert(cit, min);
+                connectivity_[min].insert(std::lower_bound(first_min, last_min, max), max);
             }
         }
     }
@@ -73,15 +64,13 @@ public:
     /**
      * Get neighbour of the node
      */
-    const label_vector_type& get_node_neighbour(label node_label) const
-    {
-        return connectivity_[node_label];
-    }
+    inline const label_vector_type& get_node_neighbour(label node_label) const
+    { return connectivity_[node_label]; }
 
     /**
      * Get number of nodes
      */
-    size_t size() const { return connectivity_.size(); }
+    inline size_t size() const { return connectivity_.size(); }
 
     /**
      * Returns a total number of connections
@@ -119,7 +108,6 @@ public:
         std::vector<bool> visited(this->size(), false);
         std::stack<label> dfs_stack;
         dfs_stack.push(label(0));
-
         while(!dfs_stack.empty())
         {
             label current_label = dfs_stack.top(); dfs_stack.pop();
@@ -127,7 +115,6 @@ public:
             {
                 observer(current_label);
                 visited[current_label] = true;
-
                 for(label l : this->get_node_neighbour(current_label)) dfs_stack.push(l);
             }
         }

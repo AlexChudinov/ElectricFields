@@ -23,7 +23,14 @@ public:
 
     void draw_mesh_geometry(QOpenGLShaderProgram* program);
 
-    const bounding_box_type& box() { return box_; }
+    /**
+     * Returns central point and scale of a geometry
+     */
+    inline const QVector3D& r0() const { return r0_; }
+    inline float scale() const { return scale_; }
+    inline QVector3D& r0() { return r0_; }
+    inline float& scale() { return scale_; }
+
 private:
     void init_mesh_geometry_();
 
@@ -31,7 +38,9 @@ private:
 
     size_t connections_number_;
 
-    bounding_box_type box_;
+    QVector3D r0_; //Central point
+
+    float scale_;
 };
 
 class gl_mesh_widget : public QOpenGLWidget, public QOpenGLFunctions
@@ -55,7 +64,7 @@ public slots:
 private:
     QOpenGLShaderProgram* program_;
 
-    mesh_geometry_engine* geometry_;
+    mesh_geometry_engine* mesh_geometry_;
 
     QMatrix4x4 projection_matrix_;
 };

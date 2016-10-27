@@ -31,25 +31,36 @@ void mesh_geometry_engine::init_mesh_geometry_()
 {
     mesh_geom::node_positions connections = geom_.mesh_connections();
     connections_number_ = connections.size();
-    box_ = geom_.containing_box();
     array_buf_->bind();
     array_buf_->allocate
             (
                 connections.data(),
                 connections.size()*sizeof(mesh_geom::vector3f));
+
+    //Set image box parameters
+    bounding_box_type box = geom_.containing_box();
+    r0_ = .5 * QVector3D(
+            box.second[0] + box.first[0],
+            box.second[1] + box.first[1],
+            box.second[2] + box.first[2]);
+    scale_ = std::max(
+                box.second[0] - box.first[0],
+                std::max(
+                    box.second[1] - box.first[1],
+                    box.second[2] - box.first[2]));
 }
 
 gl_mesh_widget::gl_mesh_widget(QWidget *parent)
     :
       QOpenGLWidget(parent),
       program_(new QOpenGLShaderProgram(this)),
-      geometry_(nullptr)
+      mesh_geometry_(nullptr)
 {}
 
 gl_mesh_widget::~gl_mesh_widget()
 {
     this->makeCurrent();
-    if(geometry_) delete geometry_;
+    if(mesh_geometry_) delete mesh_geometry_;
     this->doneCurrent();
 }
 
@@ -73,7 +84,7 @@ void gl_mesh_widget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+    const qreal zNear = 2.0, zFar = 6.0, fov = 45.0;
 
     // Reset projection
     projection_matrix_.setToIdentity();
@@ -84,32 +95,31 @@ void gl_mesh_widget::resizeGL(int w, int h)
 
 void gl_mesh_widget::paintGL()
 {
-    if(geometry_)
+    if(mesh_geometry_)
     {
         QMatrix4x4 matrix;
         matrix.setToIdentity();
-        matrix.translate(0.0, 0.0, -3.0);
 
-        //Get mesh bounding box
-        bounding_box_type box3d = geometry_->box();
+        matrix.translate(0.0, 0.0, -4.0);
 
-        //Get mesh scale factors and central point
-        float x_scale = box3d.second[0] - box3d.first[0];
-        float y_scale = box3d.second[1] - box3d.first[1];
-        float z_scale = box3d.second[2] - box3d.first[2];
-        float x0 = box3d.first[0] + x_scale/2.;
-        float y0 = box3d.first[1] + y_scale/2.;
-        float z0 = box3d.first[2] + z_scale/2.;
-        matrix.scale(4.0/x_scale, 2.0/y_scale, 2.0/z_scale);
-        matrix.translate(-x0, y0, -z0);
+        //Set scale
+        matrix.scale(
+            2.0/mesh_geometry_->scale(),
+            2.0/mesh_geometry_->scale(),
+            2.0/mesh_geometry_->scale());
+        //Set box position
+        matrix.translate(
+            -mesh_geometry_->r0().x(),
+            mesh_geometry_->r0().y(),
+            -mesh_geometry_->r0().z());
 
         program_->setUniformValue("mvp_matrix", projection_matrix_*matrix);
-        geometry_->draw_mesh_geometry(program_);
+        mesh_geometry_->draw_mesh_geometry(program_);
     }
 }
 
 void gl_mesh_widget::set_mesh_pointer(const mesh_geom *geom)
 {
-    geometry_ = new mesh_geometry_engine(*geom);
+    mesh_geometry_ = new mesh_geometry_engine(*geom);
     this->update();
 }

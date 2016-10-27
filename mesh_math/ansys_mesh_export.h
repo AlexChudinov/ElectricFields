@@ -129,7 +129,16 @@ mesh_geometry<Float, label> parse_ansys_boundary_mesh
         Stream &in,
         SkipLine skip_line)
 {
+    using mesh_geometry = mesh_geometry<Float, label>;
+    size_t elems_number;
 
+    skip_line(in);
+    in >> elems_number;
+    //Read triangles
+    for(size_t i = 0; i < elems_number; ++i)
+    {
+        //TODO:....//
+    }
 }
 
 #endif // ANSYS_MESH_LOAD_H
