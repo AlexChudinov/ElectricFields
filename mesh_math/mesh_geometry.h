@@ -33,7 +33,7 @@ public:
     };
     using node_types_list= std::vector<NODE_TYPE>;
 
-protected:
+private:
     graph mesh_connectivity_;
     node_positions node_positions_;
     boundary_regions_list boundary_mesh_;

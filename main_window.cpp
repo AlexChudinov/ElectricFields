@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
       QMainWindow(parent),
       tool_bar_(new QToolBar(this)),
       status_bar_(new QStatusBar(this)),
-      file_open_action_(new QAction(QIcon(":/file_open_icon"),QObject::tr("Open file"), this)),
+      file_open_action_(new QAction(QIcon(":/Icons/file_open_icon"),QObject::tr("Open file"), this)),
       app_data_(),
       splitter_(new QSplitter(this))
 {
@@ -43,6 +43,7 @@ void MainWindow::open_file_action()
 {
     QProgressBar progress_bar_;
     progress_bar_.setRange(0, 5);
+    progress_bar_.setTextVisible(true);
     progress_bar_.setFormat("File loading...");
     status_bar_->addWidget(&progress_bar_);
 
@@ -76,8 +77,8 @@ void MainWindow::open_file_action()
                          [&progress_bar_, &progress](QTextStream& stream)
             {
                          QString name = stream.readLine();
-                         progress_bar_.setValue(progress++);
-                         progress_bar_.setFormat(name);
+                         progress_bar_.setFormat(QString("Loading: ") + name);
+                         progress_bar_.setValue(++progress);
             }
                      ));
             file.close();

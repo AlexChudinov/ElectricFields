@@ -59,8 +59,8 @@ void gl_mesh_widget::initializeGL()
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-    program_->addShaderFromSourceFile(QOpenGLShader::Vertex,":/vector_shader");
-    program_->addShaderFromSourceFile(QOpenGLShader::Fragment,":/fragment_shader");
+    program_->addShaderFromSourceFile(QOpenGLShader::Vertex,":/Shaders/vector_shader");
+    program_->addShaderFromSourceFile(QOpenGLShader::Fragment,":/Shaders/fragment_shader");
     program_->link();
     program_->bind();
 
@@ -96,10 +96,12 @@ void gl_mesh_widget::paintGL()
         //Get mesh scale factors and central point
         float x_scale = box3d.second[0] - box3d.first[0];
         float y_scale = box3d.second[1] - box3d.first[1];
+        float z_scale = box3d.second[2] - box3d.first[2];
         float x0 = box3d.first[0] + x_scale/2.;
         float y0 = box3d.first[1] + y_scale/2.;
-        matrix.scale(4.0/x_scale, 2.0/y_scale, 1.0);
-        matrix.translate(-x0, y0, 0.0);
+        float z0 = box3d.first[2] + z_scale/2.;
+        matrix.scale(4.0/x_scale, 2.0/y_scale, 2.0/z_scale);
+        matrix.translate(-x0, y0, -z0);
 
         program_->setUniformValue("mvp_matrix", projection_matrix_*matrix);
         geometry_->draw_mesh_geometry(program_);
