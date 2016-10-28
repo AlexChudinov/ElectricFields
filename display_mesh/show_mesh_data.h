@@ -4,6 +4,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QMatrix4x4>
+#include <QVector2D>
 #include "mesh_geometry.h"
 #include "show_mesh_data.h"
 
@@ -54,12 +55,12 @@ public:
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
 
-    //void mousePressEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
-    //void mouseReleaseEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
-    //void wheelEvent(QWheelEvent * event) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
 
 public slots:
     void set_mesh_pointer(const mesh_geom *geom);
+    void magnify(float factor = 1.1);
 
 private:
     QOpenGLShaderProgram* program_;
@@ -67,6 +68,9 @@ private:
     mesh_geometry_engine* mesh_geometry_;
 
     QMatrix4x4 projection_matrix_;
+
+    QVector2D press_mouse_position_;
+    QMatrix4x4 rotation_matrix_;
 };
 
 #endif // SHOW_MESH_DATA_H

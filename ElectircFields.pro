@@ -8,12 +8,11 @@ TEMPLATE = app
 SOURCES += main.cpp \
     main_window.cpp
 
-INCLUDEPATH += C:/Proj_22022016/BarnesHut #Path to matrix and vector headers
-
 HEADERS += main_window.h \
     app_data.h
 
 include(display_mesh/display_mesh.pri)
 include(mesh_math/mesh_math.pri)
+include(linear_algebra/linear_algebra.pri)
 
 RESOURCES += resources.qrc

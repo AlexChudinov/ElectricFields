@@ -12,29 +12,38 @@
 MainWindow::MainWindow(QWidget *parent)
     :
       QMainWindow(parent),
-      tool_bar_(new QToolBar(this)),
       status_bar_(new QStatusBar(this)),
-      file_open_action_(new QAction(QIcon(":/Icons/file_open_icon"),QObject::tr("Open file"), this)),
       app_data_(),
       splitter_(new QSplitter(this))
 {
     //Set widgets and parameters
     this->resize(600, 400);
-    this->addToolBar(tool_bar_);
     this->setCentralWidget(splitter_);
     this->setStatusBar(status_bar_);
 
-    //Create tool bar actions
-    tool_bar_->addAction(file_open_action_);
+    //File open action:
+    QAction* file_open_action = new QAction(QIcon(":/Icons/file_open_icon"),"Open file",this);
+    connect(file_open_action,SIGNAL(triggered()),
+            this,SLOT(open_file_action()));
+
+    //Magnify mesh view toolbar
+    QAction* magnify_action = new QAction(QIcon(":/Icons/magnify_icon"), "Magnify mesh", this);
+
+    //Create file tool bar and add actions to it
+    QToolBar* file_toolbar = new QToolBar("File toolbar",this);
+    this->addToolBar(file_toolbar);
+    file_toolbar->addAction(file_open_action);
+
+    //Create mesh view toolbar
+    QToolBar* mesh_view_toolbar = new QToolBar("Mesh view toolbar", this);
+    this->addToolBar(mesh_view_toolbar);
+    mesh_view_toolbar->addAction(magnify_action);
 
     gl_mesh_widget* gl_mesh_widget_ = new gl_mesh_widget(this);
     connect(this, SIGNAL(mesh_loaded(const mesh_geom*)),
             gl_mesh_widget_, SLOT(set_mesh_pointer(const mesh_geom*)));
+    connect(magnify_action, SIGNAL(triggered()), gl_mesh_widget_, SLOT(magnify()));
     splitter_->addWidget(gl_mesh_widget_);
-
-    //Connect file open action
-    connect(file_open_action_,SIGNAL(triggered()),
-            this,SLOT(open_file_action()));
 }
 
 MainWindow::~MainWindow(){}
@@ -78,7 +87,7 @@ void MainWindow::open_file_action()
                          [&progress_bar_, &progress](QTextStream& stream)
             {
                          QString name = stream.readLine();
-                         progress_bar_.setFormat(QString("Loading: ") + name);
+                         progress_bar_.setFormat(name);
                          progress_bar_.setValue(++progress);
             }
                      ));

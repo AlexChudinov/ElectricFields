@@ -1,8 +1,9 @@
 <RCC>
-    <qresource prefix="Icons">
+    <qresource prefix="/Icons">
         <file alias="file_open_icon">Pictures/file_open_icon.png</file>
+        <file alias="magnify_icon">Pictures/magnifying-glass-icon.png</file>
     </qresource>
-    <qresource prefix="Shaders">
+    <qresource prefix="/Shaders">
         <file alias="vector_shader">Shaders/vshader.glsl</file>
         <file alias="fragment_shader">Shaders/fshader.frag</file>
     </qresource>
