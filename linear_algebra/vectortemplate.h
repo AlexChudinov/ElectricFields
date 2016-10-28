@@ -35,17 +35,6 @@ template<class T, size_t N> struct vector_c : std::array<T, N>
         inline void operator () (T& x) { x = *(this->cur_++); }
     };
 
-    /**
-     * Prints vector element
-     */
-    struct print_val
-    {
-        std::ostream& out_;
-        inline print_val(std::ostream& out):out_(out){}
-        inline void operator () (const T& x) const
-        { out_ << x << " "; }
-    };
-
     vector_c() {}
 
     explicit vector_c(const T& val)
@@ -213,9 +202,8 @@ std::ostream& operator << (std::ostream& out, const vector_c<T, N>& v)
 {
     using type = typename vector_c<T, N>::type;
     math::array_operations<type, type, N - 1> op;
-    using print_val = typename type::print_val;
     out << "( ";
-    op.umap(print_val(out),const_cast<type&>(v));
+    op.umap([&out](T& val){ out << val << " "; }, const_cast<type&>(v));
     out << ")";
     return out;
 }

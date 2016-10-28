@@ -29,7 +29,7 @@ void mesh_model::reset_mesh_model()
     this->setHorizontalHeaderItem(0,new QStandardItem("Name"));
     this->setHorizontalHeaderItem(1,new QStandardItem("Type"));
     this->setHorizontalHeaderItem(2,new QStandardItem("Size"));
-    for(size_t i = 0; i < boundary_names_.size(); ++i)
+    for(int i = 0; i < boundary_names_.size(); ++i)
     {
         this->setItem(i,0,new QStandardItem(boundary_names_[i]));
         this->setItem(i,1,new QStandardItem(QString("%1").arg(i)));

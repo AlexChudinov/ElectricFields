@@ -94,9 +94,6 @@ void gl_mesh_widget::paintGL()
         QMatrix4x4 matrix;
         matrix.setToIdentity();
 
-        matrix.translate(0.0f, 0.0f, -4.0f);
-        matrix.rotate(180.0f, 1.0f, 0.0f);
-
         //Set scale
         matrix.scale(
             2.0f/mesh_geometry_->scale(),
@@ -107,7 +104,10 @@ void gl_mesh_widget::paintGL()
             -mesh_geometry_->r0().x(),
             -mesh_geometry_->r0().y(),
             mesh_geometry_->r0().z());
-        matrix = rotation_matrix_*matrix;
+        matrix = matrix*rotation_matrix_;
+
+        matrix.translate(0.0f, 0.0f, -4.0f);
+        matrix.rotate(180.0f, 1.0f, 0.0f);
 
         program_->setUniformValue("mvp_matrix", projection_matrix_*matrix);
         mesh_geometry_->draw_mesh_geometry(program_);
