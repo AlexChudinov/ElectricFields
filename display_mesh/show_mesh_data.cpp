@@ -95,13 +95,17 @@ void gl_mesh_widget::paintGL()
     if(mesh_geometry_)
     {
         float scale_factor = 2.0f/mesh_geometry_->scale();
-        QMatrix4x4 matrix, matrix_projection;
-        matrix.translate(0.0f, 0.0f, -4.0f);
+        QMatrix4x4 matrix_modelview, matrix_projection, matrix_rotation;
 
         //Set box position and rotate
-        matrix.scale(scale_factor);
-        matrix.translate(-mesh_geometry_->r0());
-        matrix.rotate(rotation_);
+        matrix_modelview.scale(scale_factor);
+        matrix_modelview.translate(-mesh_geometry_->r0());
+        matrix_rotation.rotate(rotation_);
+
+        matrix_modelview =matrix_rotation*matrix_modelview;
+
+        //Translate to z = -4.0
+        matrix_modelview(2,3) -= 4.0;
 
         matrix_projection.perspective
                 (45.0f,
@@ -110,7 +114,7 @@ void gl_mesh_widget::paintGL()
                  6.0
                  );
 
-        program_->setUniformValue("mvp_matrix", matrix_projection*matrix);
+        program_->setUniformValue("mvp_matrix", matrix_projection*matrix_modelview);
         mesh_geometry_->draw_mesh_geometry(program_);
     }
 }
@@ -142,7 +146,7 @@ void gl_mesh_widget::mouseMoveEvent(QMouseEvent *event)
         QVector2D diff = QVector2D(event->localPos()) - this->press_mouse_position_;
         diff.setX(diff.x() / this->width()); diff.setY(diff.y() / this->height());
 
-        float rotation_angle = diff.length() != 0.0f ? 180.0f * diff.length() : 0.0f;
+        float rotation_angle = diff.length() != 0.0f ? 90.0f * diff.length() : 0.0f;
 
         QVector3D rotation_axis = QVector3D(diff.y(), diff.x(), 0.0f).normalized();
 
