@@ -5,6 +5,7 @@
 #include <QOpenGLWidget>
 #include <QMatrix4x4>
 #include <QVector2D>
+#include <QQuaternion>
 #include "mesh_geometry.h"
 #include "show_mesh_data.h"
 
@@ -67,10 +68,11 @@ private:
 
     mesh_geometry_engine* mesh_geometry_;
 
-    QMatrix4x4 projection_matrix_;
-
     QVector2D press_mouse_position_;
-    QMatrix4x4 rotation_matrix_;
+
+    QQuaternion rotation_;
+
+    int screen_width_, screen_height_;
 };
 
 #endif // SHOW_MESH_DATA_H
