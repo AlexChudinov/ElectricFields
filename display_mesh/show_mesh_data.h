@@ -33,6 +33,11 @@ public:
     inline QVector3D& r0() { return r0_; }
     inline float& scale() { return scale_; }
 
+    /**
+     * Sets default image box parameters
+     */
+    void set_defaults();
+
 private:
     void init_mesh_geometry_();
 
@@ -58,10 +63,15 @@ public:
 
     void mousePressEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
-
+    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 public slots:
     void set_mesh_pointer(const mesh_geom *geom);
     void magnify(float factor = 1.1);
+
+    /**
+     * Returns default position of a picture onto screen
+     */
+    void set_default_view();
 
 private:
     QOpenGLShaderProgram* program_;
