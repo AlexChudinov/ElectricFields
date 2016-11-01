@@ -107,12 +107,11 @@ void gl_mesh_widget::paintGL()
         //Translate to z = -4.0
         matrix_modelview(2,3) -= 4.0;
 
-        matrix_projection.perspective
-                (45.0f,
-                 qreal(this->screen_width_)/qreal(this->screen_height_),
-                 2.0,
-                 6.0
-                 );
+        matrix_projection.perspective(
+            45.0f,
+            qreal(this->screen_width_)/qreal(this->screen_height_),
+            2.0,
+            6.0);
 
         program_->setUniformValue("mvp_matrix", matrix_projection*matrix_modelview);
         mesh_geometry_->draw_mesh_geometry(program_);
