@@ -60,7 +60,8 @@ gl_mesh_widget::gl_mesh_widget(QWidget *parent)
       QOpenGLWidget(parent),
       program_(new QOpenGLShaderProgram(this)),
       mesh_geometry_(nullptr),
-      rotation_()
+      rotation_(),
+      translation_(0.0f, 0.0f)
 { }
 
 gl_mesh_widget::~gl_mesh_widget()
@@ -97,12 +98,11 @@ void gl_mesh_widget::paintGL()
         float scale_factor = 2.0f/mesh_geometry_->scale();
         QMatrix4x4 matrix_modelview, matrix_projection, matrix_rotation;
 
-        //Set box position and rotate
+        //Set box position, rotate and shift
         matrix_modelview.scale(scale_factor);
         matrix_modelview.translate(-mesh_geometry_->r0());
         matrix_rotation.rotate(rotation_);
-
-        matrix_modelview =matrix_rotation*matrix_modelview;
+        matrix_modelview = matrix_rotation*matrix_modelview;
 
         //Translate to z = -4.0
         matrix_modelview(2,3) -= 4.0;
@@ -113,7 +113,11 @@ void gl_mesh_widget::paintGL()
             2.0,
             6.0);
 
-        program_->setUniformValue("mvp_matrix", matrix_projection*matrix_modelview);
+        matrix_modelview = matrix_projection * matrix_modelview;
+        matrix_modelview(0,3) += translation_.x();
+        matrix_modelview(1,3) += translation_.y();
+
+        program_->setUniformValue("mvp_matrix", matrix_modelview);
         mesh_geometry_->draw_mesh_geometry(program_);
     }
 }
@@ -140,25 +144,24 @@ void gl_mesh_widget::mousePressEvent(QMouseEvent *event)
 
 void gl_mesh_widget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(event->buttons() == Qt::LeftButton)
+    //Get position difference and normalize
+    QVector2D diff = QVector2D(event->localPos()) - this->press_mouse_position_;
+    diff.setX(diff.x() / this->width()); diff.setY(diff.y() / this->height());
+
+    if(event->buttons() == Qt::LeftButton) //rotate
     {
-        QVector2D diff = QVector2D(event->localPos()) - this->press_mouse_position_;
-        diff.setX(diff.x() / this->width()); diff.setY(diff.y() / this->height());
-
-        float rotation_angle = diff.length() != 0.0f ? 90.0f * diff.length() : 0.0f;
-
+        float rotation_angle = diff.length() != 0.0f ? 45.0f * diff.length() : 0.0f;
         QVector3D rotation_axis = QVector3D(diff.y(), diff.x(), 0.0f).normalized();
-
         rotation_ =
                 QQuaternion::fromAxisAndAngle(rotation_axis, rotation_angle) * rotation_;
-
         this->update();
     }
-}
-
-void gl_mesh_widget::mouseReleaseEvent(QMouseEvent *event)
-{
-
+    if(event->buttons() == Qt::RightButton) //shift
+    {
+        QVector2D shift(diff.x(), -diff.y());
+        this->translation_ += shift;
+        this->update();
+    }
 }
 
 void gl_mesh_widget::set_default_view()
@@ -166,6 +169,7 @@ void gl_mesh_widget::set_default_view()
     if(this->mesh_geometry_)
     {
         this->rotation_ = QQuaternion();
+        this->translation_ = QVector2D(0.0f, 0.0f);
         this->mesh_geometry_->set_defaults();
         this->update();
     }
