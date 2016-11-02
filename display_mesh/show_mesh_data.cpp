@@ -150,6 +150,7 @@ void gl_mesh_widget::mouseMoveEvent(QMouseEvent *event)
 
     if(event->buttons() == Qt::LeftButton) //rotate
     {
+        this->press_mouse_position_ = QVector2D(event->localPos());
         float rotation_angle = diff.length() != 0.0f ? 45.0f * diff.length() : 0.0f;
         QVector3D rotation_axis = QVector3D(diff.y(), diff.x(), 0.0f).normalized();
         rotation_ =
@@ -158,6 +159,7 @@ void gl_mesh_widget::mouseMoveEvent(QMouseEvent *event)
     }
     if(event->buttons() == Qt::RightButton) //shift
     {
+        this->press_mouse_position_ = QVector2D(event->localPos());
         QVector2D shift(diff.x(), -diff.y());
         this->translation_ += shift;
         this->update();
