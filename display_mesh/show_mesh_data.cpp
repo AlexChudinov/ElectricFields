@@ -114,8 +114,8 @@ void gl_mesh_widget::paintGL()
             6.0);
 
         matrix_modelview = matrix_projection * matrix_modelview;
-        matrix_modelview(0,3) += translation_.x();
-        matrix_modelview(1,3) += translation_.y();
+        matrix_modelview(0,3) += translation_.x()*scale_factor;
+        matrix_modelview(1,3) += translation_.y()*scale_factor;
 
         program_->setUniformValue("mvp_matrix", matrix_modelview);
         mesh_geometry_->draw_mesh_geometry(program_);
@@ -151,7 +151,7 @@ void gl_mesh_widget::mouseMoveEvent(QMouseEvent *event)
     if(event->buttons() == Qt::LeftButton) //rotate
     {
         this->press_mouse_position_ = QVector2D(event->localPos());
-        float rotation_angle = diff.length() != 0.0f ? 45.0f * diff.length() : 0.0f;
+        float rotation_angle = diff.length() != 0.0f ? 180.0f * diff.length() : 0.0f;
         QVector3D rotation_axis = QVector3D(diff.y(), diff.x(), 0.0f).normalized();
         rotation_ =
                 QQuaternion::fromAxisAndAngle(rotation_axis, rotation_angle) * rotation_;

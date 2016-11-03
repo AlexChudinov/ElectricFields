@@ -28,8 +28,6 @@ public slots:
 private:
     QStatusBar* status_bar_;
 
-    constexpr static const char* file_open_filters_ = "Ansys mesh: (*.geom)";
-
     /**
      * Contains all application data
      */

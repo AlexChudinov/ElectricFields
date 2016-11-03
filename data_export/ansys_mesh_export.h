@@ -124,7 +124,7 @@ template
  typename label,
  typename Stream,
  typename SkipLine>
-mesh_geometry<Float, label> parse_ansys_boundary_mesh
+typename mesh_geometry<Float, label>::boundary_entry parse_ansys_boundary_mesh
 (
         Stream &in,
         SkipLine skip_line)

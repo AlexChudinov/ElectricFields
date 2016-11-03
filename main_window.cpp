@@ -1,13 +1,11 @@
 #include "main_window.h"
 #include <QToolBar>
 #include <QAction>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QTextStream>
 #include <QSplitter>
 #include <QBoxLayout>
 #include <QStatusBar>
 #include <QProgressBar>
+#include "data_export/load_data_tread.h"
 
 MainWindow::MainWindow(QWidget *parent)
     :
@@ -56,50 +54,16 @@ MainWindow::~MainWindow(){}
 void MainWindow::open_file_action()
 {
     QProgressBar progress_bar_;
-    progress_bar_.setRange(0, 5);
+    progress_bar_.setRange(0, 100);
     progress_bar_.setTextVisible(true);
     progress_bar_.setFormat("File loading...");
     progress_bar_.setAlignment(Qt::AlignCenter);
     status_bar_->addWidget(&progress_bar_);
 
-    QString file_name = QFileDialog::getOpenFileName
-            (
-                this,
-                "Open file",
-                QString(),
-                QString(MainWindow::file_open_filters_));
+    load_data_thread* load_thread = new load_data_thread(&progress_bar_, app_data_, this);
+    connect(load_thread,SIGNAL(started()),this,SLOT());
 
-    if(!file_name.isNull())
-    {
-        QFile file(file_name);
-        if(!file.open(QIODevice::ReadOnly))
-        {
-            QMessageBox::warning
-                    (this,
-                     "File open dialog",
-                     QString("Fail to open file: ").append(file_name));
-            return;
-        }
-        else
-        {
-            QTextStream stream(&file);
-            int progress = 1;
-            app_data_.mesh_geometry_
-                    = new app_data::mesh_geom
-                    (parse_ansys_mesh<float, uint32_t>
-                     (
-                         stream,
-                         [&progress_bar_, &progress](QTextStream& stream)
-            {
-                         QString name = stream.readLine();
-                         progress_bar_.setFormat(name);
-                         progress_bar_.setValue(++progress);
-            }
-                     ));
-            file.close();
-            emit mesh_loaded(app_data_.mesh_geometry_);
-        }
-    }
+    load_thread.run();
 
     status_bar_->removeWidget(&progress_bar_);
 }
