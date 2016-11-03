@@ -18,7 +18,6 @@ public:
     load_data_thread(
             QProgressBar* progress_bar,
             app_data* data,
-            LOADER_FUN fun,
             QObject* parent = 0);
     ~load_data_thread();
 
