@@ -6,28 +6,21 @@
 
 class Observer;
 class QSplitter;
+class QProgressBar;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    /**
-     * Loading mesh data
-     */
-    void load_mesh_(const QString& file_name);
-
 public:
     MainWindow(QWidget* parent = 0);
     ~MainWindow();
-
-signals:
-    void mesh_loaded(const mesh_geom*);
 
 public slots:
     void open_file_action();
 
 private:
-    Observer* observer_;
+    QProgressBar* progress_bar_;
 
     /**
      * Contains all application data

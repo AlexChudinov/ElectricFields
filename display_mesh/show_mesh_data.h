@@ -17,10 +17,10 @@ using bounding_box_type = mesh_geom::box3D;
 
 class mesh_geometry_engine : public QOpenGLFunctions
 {
-    const mesh_geom& geom_;
+    QSharedPointer<mesh_geom> geom_;
 
 public:
-    mesh_geometry_engine(const mesh_geom& geom);
+    mesh_geometry_engine(const QSharedPointer<mesh_geom>& geom);
     virtual ~mesh_geometry_engine();
 
     void draw_mesh_geometry(QOpenGLShaderProgram* program);
@@ -64,7 +64,10 @@ public:
     void mousePressEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 public slots:
-    void set_mesh_pointer(const mesh_geom *geom);
+    /**
+     * Sets new mesh to display
+     */
+    void set_mesh(const QSharedPointer<mesh_geom> &geom);
     void magnify(float factor = 1.1);
 
     /**
@@ -75,7 +78,7 @@ public slots:
 private:
     QOpenGLShaderProgram* program_;
 
-    mesh_geometry_engine* mesh_geometry_;
+    QScopedPointer<mesh_geometry_engine> mesh_geometry_;
 
     QVector2D press_mouse_position_;
 

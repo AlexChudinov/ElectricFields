@@ -3,7 +3,7 @@
 #include <QOpenGLShaderProgram>
 #include <QWheelEvent>
 
-mesh_geometry_engine::mesh_geometry_engine(const mesh_geom &geom)
+mesh_geometry_engine::mesh_geometry_engine(const QSharedPointer<mesh_geom> &geom)
     : geom_(geom),
       array_buf_(new QOpenGLBuffer()),
       connections_number_(0)
@@ -30,7 +30,7 @@ void mesh_geometry_engine::draw_mesh_geometry(QOpenGLShaderProgram *program)
 
 void mesh_geometry_engine::init_mesh_geometry_()
 {
-    mesh_geom::node_positions connections = geom_.mesh_connections();
+    mesh_geom::node_positions connections = geom_->mesh_connections();
     this->connections_number_ = connections.size();
     this->array_buf_->bind();
     this->array_buf_->allocate
@@ -43,7 +43,7 @@ void mesh_geometry_engine::init_mesh_geometry_()
 void mesh_geometry_engine::set_defaults()
 {
     //Set image box parameters
-    bounding_box_type box = geom_.containing_box();
+    bounding_box_type box = geom_->containing_box();
     this->r0_ = .5 * QVector3D(
             box.second[0] + box.first[0],
             box.second[1] + box.first[1],
@@ -59,15 +59,12 @@ gl_mesh_widget::gl_mesh_widget(QWidget *parent)
     :
       QOpenGLWidget(parent),
       program_(new QOpenGLShaderProgram(this)),
-      mesh_geometry_(nullptr),
-      rotation_(),
       translation_(0.0f, 0.0f)
 { }
 
 gl_mesh_widget::~gl_mesh_widget()
 {
     this->makeCurrent();
-    if(mesh_geometry_) delete mesh_geometry_;
     this->doneCurrent();
 }
 
@@ -122,9 +119,9 @@ void gl_mesh_widget::paintGL()
     }
 }
 
-void gl_mesh_widget::set_mesh_pointer(const mesh_geom *geom)
+void gl_mesh_widget::set_mesh(const QSharedPointer<mesh_geom>& geom)
 {
-    mesh_geometry_ = new mesh_geometry_engine(*geom);
+    mesh_geometry_.reset(new mesh_geometry_engine(geom));
     this->update();
 }
 

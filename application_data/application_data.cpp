@@ -5,16 +5,16 @@
 #include <QFile>
 #include <QTextStream>
 
+Q_DECLARE_METATYPE(QSharedPointer<mesh_geom>)
+
 application_data::application_data(QObject* parent)
     :
       QThread(parent),
-      mesh_geometry_(nullptr),
       process_(&application_data::load_mesh)
-{}
-
-application_data::~application_data()
 {
-    this->clear_mesh_();
+    qRegisterMetaType<QSharedPointer<mesh_geom>>("QSharedPointer<mesh_geom>");
+    connect(this, SIGNAL(started()), this, SIGNAL(application_data_holder_busy()));
+    connect(this, SIGNAL(finished()), this, SIGNAL(application_data_holder_free()));
 }
 
 void application_data::run()
@@ -33,21 +33,14 @@ void application_data::set_process(application_data::PROCESS_ID process_id)
     }
 }
 
-void application_data::clear_mesh_()
+void application_data::load_mesh(QString file_name)
 {
-    if(this->mesh_geometry_) delete this->mesh_geometry_;
-    this->mesh_geometry_ = nullptr;
-}
-
-void application_data::load_mesh(QString fileName)
-{
-    QFile file(fileName);
+    QFile file(file_name);
     if(file.open(QIODevice::ReadOnly))
     {
-        this->clear_mesh_();
         size_t progress_val = 0;
         QTextStream stream(&file);
-        this->mesh_geometry_ = new mesh_geom(
+        this->mesh_geometry_ = QSharedPointer<mesh_geom>::create(
                     parse_ansys_mesh<float, uint32_t>
                     (
                         stream,

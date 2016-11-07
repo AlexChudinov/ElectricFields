@@ -6,12 +6,9 @@ TARGET = ElectircFields
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    main_window.cpp \
-    observer.cpp
+    main_window.cpp
 
-HEADERS += main_window.h \
-    observer.h \
-    actionslist.h
+HEADERS += main_window.h
 
 include(display_mesh/display_mesh.pri)
 include(mesh_math/mesh_math.pri)
