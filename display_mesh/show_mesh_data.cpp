@@ -60,7 +60,7 @@ gl_mesh_widget::gl_mesh_widget(QWidget *parent)
       QOpenGLWidget(parent),
       program_(new QOpenGLShaderProgram(this)),
       translation_(0.0f, 0.0f)
-{ }
+{}
 
 gl_mesh_widget::~gl_mesh_widget()
 {
@@ -111,8 +111,8 @@ void gl_mesh_widget::paintGL()
             6.0);
 
         matrix_modelview = matrix_projection * matrix_modelview;
-        matrix_modelview(0,3) += translation_.x()*scale_factor;
-        matrix_modelview(1,3) += translation_.y()*scale_factor;
+        matrix_modelview(0,3) += translation_.x() * matrix_modelview(3,3);
+        matrix_modelview(1,3) += translation_.y() * matrix_modelview(3,3);
 
         program_->setUniformValue("mvp_matrix", matrix_modelview);
         mesh_geometry_->draw_mesh_geometry(program_);
@@ -158,7 +158,7 @@ void gl_mesh_widget::mouseMoveEvent(QMouseEvent *event)
     {
         this->press_mouse_position_ = QVector2D(event->localPos());
         QVector2D shift(diff.x(), -diff.y());
-        this->translation_ += shift;
+        this->translation_ += 2.0*shift;
         this->update();
     }
 }

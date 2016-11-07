@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Set status bar connections
     status_bar_->addWidget(progress_bar_);
-    connect(app_data_, SIGNAL(finished()), status_bar_, SLOT(hide()));
+    connect(app_data_, SIGNAL(finished()), progress_bar_, SLOT(hide()));
     connect(app_data_, SIGNAL(progress_value(int)), progress_bar_, SLOT(setValue(int)));
 
     //File open action:
