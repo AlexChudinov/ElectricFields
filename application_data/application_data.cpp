@@ -75,8 +75,8 @@ void application_data::load_boundary_regions(QString file_name)
         if(!parse_ansys_boundary_mesh(*this->mesh_geometry_, stream,
                                       [&progress_val, &progress_coeff, this]()
         {
-            progress_val += progress_coeff;
             emit this->progress_value(progress_val);
+            progress_val += progress_coeff;
         }))
             emit this->warning("Some errors occur during the boundary mesh reading!");
 

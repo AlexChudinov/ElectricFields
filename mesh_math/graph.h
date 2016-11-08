@@ -20,6 +20,7 @@ class graph
     using label_vector_type = std::vector<label>;
     using connectivity_type = std::vector<label_vector_type>;
     using connection_type   = std::pair<label, label>;
+    using compacted_graph   = std::pair<graph, label_vector_type>;
 
     connectivity_type connectivity_;
 
@@ -134,6 +135,46 @@ public:
                 }
             }
         }
+    }
+
+    /**
+     * Removes nodes with empty connections, compacting initial graph and storing mapping to an initial graph nodes
+     * into a vector of labels. So the old label can be accessed using new labels and this vector
+     */
+    compacted_graph remove_empty_connections() const
+    {
+        compacted_graph result;
+        result.second.reserve(connectivity_.size());
+
+        auto observer = [&result, this](label node_label1, label node_label2)
+        {
+            label new_label1, new_label2;
+            typename label_vector_type::const_iterator
+                    first = result.second.cbegin(),
+                    last  = result.second.cend(),
+                    current = std::lower_bound(first, last, node_label1);
+
+            if( *current != node_label1 )
+            {
+                new_label1 = result.second.size();
+                result.second.insert(current, node_label1);
+            }
+            else new_label1 = std::distance(first, current);
+
+            current = std::lower_bound(current, last, node_label2);
+            if( *current != node_label2 )
+            {
+                new_label2 = result.second.size();
+                result.second.insert(current, node_label2);
+            }
+            else new_label2 = std::distance(first, current);
+
+            result.first.add_connection(new_label1, new_label2);
+        };
+
+        this->iterate_over_unique_connections(observer);
+
+        return result;
     }
 };
 

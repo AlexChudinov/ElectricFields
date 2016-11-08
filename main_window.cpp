@@ -1,5 +1,6 @@
 #include "main_window.h"
 #include "display_mesh/show_mesh_data.h"
+#include "display_mesh/mesh_model.h"
 
 #include <QThreadPool>
 #include <QToolBar>
@@ -59,7 +60,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(magnify_action, SIGNAL(triggered()), gl_mesh_widget_, SLOT(magnify()));
     connect(default_view_action, SIGNAL(triggered()), gl_mesh_widget_, SLOT(set_default_view()));
 
+    //Create table view to show all mesh and field parameters
+    mesh_model_view* mesh_model_view_ = new mesh_model_view(this);
+    connect(app_data_, SIGNAL(mesh_loaded(QSharedPointer<mesh_geom>)),
+            mesh_model_view_, SLOT(reset_mesh_model(QSharedPointer<mesh_geom>)));
+    connect(app_data_, SIGNAL(boundary_loaded(const QSharedPointer<mesh_geom>&)),
+            mesh_model_view_, SLOT(reset_mesh_model(const QSharedPointer<mesh_geom>&)));
+
+    //Show mesh and boundary parameters table
     splitter_->addWidget(gl_mesh_widget_);
+    splitter_->addWidget(mesh_model_view_);
+    splitter_->setStretchFactor(0, 10);
+    splitter_->setStretchFactor(1, 1);
+
 }
 
 MainWindow::~MainWindow(){}

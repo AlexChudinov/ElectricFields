@@ -22,11 +22,13 @@ public:
     using vector3f       = math::vector_c<Float, 3>;
     using node_positions = std::vector<vector3f>;
     using box3D          = std::pair<vector3f, vector3f>;
-    using boundary_regions_list = std::map<string, graph>;
+    using label_vector   = std::vector<label>;
+    using boundary_region_type = std::pair<graph, label_vector>; //label_vector creates boundary labels into the mesh mapping
+    using boundary_regions_list = std::map<string, boundary_region_type>;
     using field          = std::vector<Float>;
     using fields_list    = std::map<string, field>;
     using field_entry    = std::pair<string, field>;
-    using boundary_entry = std::pair<string, graph>;
+    using boundary_entry = std::pair<string, boundary_region_type>;
 
     /**
      *  Node types of a mesh
@@ -130,15 +132,15 @@ public:
         //If the mesh is not fitted with the boundary
         if(!(this->check_boundary(mesh))) return false;
 
-        this->boundary_mesh_[name] = mesh;
+        const boundary_region_type& br =
+                (this->boundary_mesh_[name] = mesh.remove_empty_connections());
 
-        auto observer = [this,type,&mesh](label node_label)
+        auto observer = [this,type,br](label node_label)
         {
-            if(!mesh.get_node_neighbour(node_label).empty())
-                this->node_types_[node_label] = type;
+            this->node_types_[br.second[node_label]] = type;
         };
 
-        mesh.dfs_iterative(observer);
+        br.first.dfs_iterative(observer);
 
         return true;
     }
@@ -158,12 +160,15 @@ public:
         //If there is no such a field
         if(!(this->is_field(field_name))) return false;
 
-        auto observer = [this, val, field_name](label node_label)
+        const field& f = this->fields_[field_name];
+        const boundary_region_type& br = this->boundary_mesh_[boundary_name];
+
+        auto observer = [val, f, br](label node_label)
         {
-            this->fields_[field_name][node_label] = val;
+            f[br.second[node_label]] = val;
         };
 
-        this->boundary_mesh_[boundary_name].dfs_iterative(observer);
+        br.first.dfs_iterative(observer);
 
         return true;
     }
@@ -175,12 +180,14 @@ public:
     {
         if(!(this->is_boundary(name))) return false;
 
-        auto observer = [this, type](label node_label)
+        const boundary_region_type& br = this->boundary_mesh_[name];
+
+        auto observer = [this, type, br](label node_label)
         {
-            this->node_types_[node_label] = type;
+            this->node_types_[br.second[node_label]] = type;
         };
 
-        this->boundary_mesh_[name].dfs_iterative(observer);
+        br.first.dfs_iterative(observer);
 
         return true;
     }
@@ -193,12 +200,13 @@ public:
         if(!(this->is_boundary(name))) return UNKNOWN;
 
         NODE_TYPE type;
+        const boundary_region_type& br = this->boundary_mesh_.at(name);
+        type = this->node_types_[br.second[0]];
 
-        this->boundary_mesh_.at(name).dfs_iterative([&type, this](label node_label)
+        br.first.dfs_iterative([&type, this, br](label node_label)
         {
-            if(node_label != 0 && type != this->node_types_[node_label])
+            if(br.second[node_label] != 0 && type != this->node_types_[br.second[node_label]])
                 type = UNKNOWN;
-            else type = this->node_types_[node_label];
         });
 
         return type;
@@ -213,7 +221,7 @@ public:
         //Field is not corresponds to the mesh
         if(this->node_positions_.size() != f.size()) return false;
 
-        field_ref(name) = f;
+       this->fields_[name] = f;
         return true;
     }
 

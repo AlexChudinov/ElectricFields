@@ -38,8 +38,13 @@ class mesh_model_view : public QTableView
     Q_OBJECT
     using mesh_geom = mesh_geometry<float, size_t>;
 
+    mesh_model* model_;
+public:
+    mesh_model_view(QWidget* parent = 0);
+    ~mesh_model_view();
 
-
+public slots:
+    void reset_mesh_model(const QSharedPointer<mesh_geom>& mesh);
 };
 
 #endif // MESH_MODEL_H
