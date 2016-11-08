@@ -1,7 +1,6 @@
 #include "application_data.h"
 #include "data_export/ansys_mesh_export.h"
 
-#include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
 
@@ -28,6 +27,10 @@ void application_data::set_process(application_data::PROCESS_ID process_id)
     {
     case LOAD_MESH:
         this->process_ = &application_data::load_mesh;
+        break;
+    case LOAD_BOUNDARY:
+        this->process_ = &application_data::load_boundary_regions;
+        break;
     default:
         return;
     }
@@ -41,9 +44,7 @@ void application_data::load_mesh(QString file_name)
         size_t progress_val = 0;
         QTextStream stream(&file);
         this->mesh_geometry_ = QSharedPointer<mesh_geom>::create(
-                    parse_ansys_mesh<float, uint32_t>
-                    (
-                        stream,
+                    parse_ansys_mesh(stream,
                         [&progress_val, this](QTextStream& stream)
         {
             stream.readLine();
@@ -54,10 +55,35 @@ void application_data::load_mesh(QString file_name)
     }
     else
     {
-        QMessageBox::warning(
-                    0,
-                    "Mesh reading",
-                    "Could not open file!");
+        emit this->warning("Could not open file!");
     }
 }
 
+void application_data::load_boundary_regions(QString file_name)
+{
+    QFile file(file_name);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        size_t progress_val = 0;
+        QTextStream stream(&file);
+
+        float progress_coeff;
+        stream >> progress_coeff;
+        stream.seek(0); //return back
+        progress_coeff = 100. / progress_coeff;
+
+        if(!parse_ansys_boundary_mesh(*this->mesh_geometry_, stream,
+                                      [&progress_val, &progress_coeff, this]()
+        {
+            progress_val += progress_coeff;
+            emit this->progress_value(progress_val);
+        }))
+            emit this->warning("Some errors occur during the boundary mesh reading!");
+
+        emit this->boundary_loaded(mesh_geometry_);
+    }
+    else
+    {
+        emit this->warning("Could not open file!");
+    }
+}

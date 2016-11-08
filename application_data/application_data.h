@@ -24,7 +24,8 @@ public:
      */
     enum PROCESS_ID
     {
-        LOAD_MESH ///Load mesh from a file
+        LOAD_MESH,     ///Load mesh from a file
+        LOAD_BOUNDARY  ///Load boundary regions from a file
     };
 
     application_data(QObject* parent = 0);
@@ -51,6 +52,11 @@ signals:
     void mesh_loaded(const QSharedPointer<mesh_geom>&);
 
     /**
+     * new boundary was loaded
+     */
+    void boundary_loaded(const QSharedPointer<mesh_geom>&);
+
+    /**
      * Progress flow indicator
      */
     void progress_value(int val);
@@ -61,11 +67,21 @@ signals:
     void application_data_holder_busy(bool is_busy = true);
     void application_data_holder_free(bool is_free = true);
 
+    /**
+     * Emits some warnings from a separate thread
+     */
+    void warning(QString msg);
+
 public slots:
     /**
-     * Load mesh from the file file_name
+     * Loads mesh from the file file_name
      */
     void load_mesh(QString file_name);
+
+    /**
+     * Loads boundary regions from the file file_name
+     */
+    void load_boundary_regions(QString file_name);
 
 private:
     QSharedPointer<mesh_geom> mesh_geometry_;

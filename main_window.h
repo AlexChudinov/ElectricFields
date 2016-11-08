@@ -19,6 +19,11 @@ public:
 public slots:
     void open_file_action();
 
+    /**
+     * Shows message box on a screen if one of the threads emits wwarnings or whatever
+     */
+    void show_message_box(QString msg);
+
 private:
     QProgressBar* progress_bar_;
 

@@ -1,11 +1,12 @@
 #ifndef MESH_GEOMETRY_H
 #define MESH_GEOMETRY_H
 
-#include <graph.h>
 #include <vector>
-#include <vectortemplate.h>
 #include <utility>
 #include <map>
+
+#include "linear_algebra/vectortemplate.h"
+#include "graph.h"
 
 template<typename Float, typename label> class mesh_geometry;
 
@@ -107,7 +108,7 @@ public:
      * Checks if the boundary could be attributed to the mesh
      */
     inline bool check_boundary(const graph& mesh) const
-    { return mesh.size() == this->nodes_number(); }
+    { return mesh.size() <= this->nodes_number(); }
     /**
      * Checks if the mesh has a boundary with a such name
      */
@@ -131,9 +132,10 @@ public:
 
         this->boundary_mesh_[name] = mesh;
 
-        auto observer = [this,type](label node_label)
+        auto observer = [this,type,&mesh](label node_label)
         {
-            this->node_types_[node_label] = type;
+            if(!mesh.get_node_neighbour(node_label).empty())
+                this->node_types_[node_label] = type;
         };
 
         mesh.dfs_iterative(observer);

@@ -14,13 +14,20 @@ class mesh_model : public QStandardItemModel
 
     using mesh_geom = mesh_geometry<float, uint32_t>;
 
+    /**
+     * Mesh data
+     */
     QSharedPointer<mesh_geom> mesh_;
+
 public:
-    mesh_model(const QSharedPointer<mesh_geom>& mesh, QObject *parent = 0);
+    mesh_model(QObject *parent = 0);
     ~mesh_model();
 
 public slots:
-    void reset_mesh_model();
+    /**
+     * Sets new mesh data pointer
+     */
+    void reset_mesh_model(const QSharedPointer<mesh_geom>& mesh);
 };
 
 /**

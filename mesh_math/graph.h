@@ -26,9 +26,17 @@ class graph
 public:
 
     /**
-     * Creates empty graph
+     * Creates an empty graph
      */
     graph(){}
+
+    /**
+     * Resets the connectivity array
+     */
+    void clear()
+    {
+        connectivity_.clear();
+    }
 
     /**
      * Adds new connection into the unordered graph,
@@ -107,15 +115,23 @@ public:
     {
         std::vector<bool> visited(this->size(), false);
         std::stack<label> dfs_stack;
-        dfs_stack.push(label(0));
-        while(!dfs_stack.empty())
+        std::vector<bool>::const_iterator
+                first = visited.cbegin(),
+                last  = visited.cend(),
+                current = first;
+
+        while( (current = std::find(current, last, false)) != last)
         {
-            label current_label = dfs_stack.top(); dfs_stack.pop();
-            if(!visited[current_label])
+            dfs_stack.push(label(std::distance(first, current)));
+            while(!dfs_stack.empty())
             {
-                observer(current_label);
-                visited[current_label] = true;
-                for(label l : this->get_node_neighbour(current_label)) dfs_stack.push(l);
+                label current_label = dfs_stack.top(); dfs_stack.pop();
+                if(!visited[current_label])
+                {
+                    observer(current_label);
+                    visited[current_label] = true;
+                    for(label l : this->get_node_neighbour(current_label)) dfs_stack.push(l);
+                }
             }
         }
     }

@@ -1,14 +1,14 @@
 #include "mesh_model.h"
 
-mesh_model::mesh_model(const QSharedPointer<mesh_geom> &mesh, QObject* parent)
-    : QStandardItemModel(parent),
-      mesh_(mesh)
+mesh_model::mesh_model(QObject* parent)
+    : QStandardItemModel(parent)
 {}
 
 mesh_model::~mesh_model(){}
 
-void mesh_model::reset_mesh_model()
+void mesh_model::reset_mesh_model(const QSharedPointer<mesh_geom> &mesh)
 {
+    mesh_ = mesh;
     //Clear all the items
     this->clear();
 

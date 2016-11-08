@@ -8,6 +8,7 @@
 #include <QStatusBar>
 #include <QFileDialog>
 #include <QProgressBar>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     :
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(splitter_);
     this->setStatusBar(status_bar_);
     progress_bar_->hide();
+    connect(app_data_, SIGNAL(warning(QString)), this, SLOT(show_message_box(QString)));
 
     //Set status bar connections
     status_bar_->addWidget(progress_bar_);
@@ -69,7 +71,7 @@ void MainWindow::open_file_action()
                 this,
                 "Open file dialog",
                 QString(),
-                "Ansys mesh: (*.geom)");
+                "Ansys mesh: (*.geom) ;; Boundary regions: (*.rgn)");
     if( file_name.isNull() ) return;
 
     if( file_name.split(".").at(1) == "geom" )
@@ -78,5 +80,22 @@ void MainWindow::open_file_action()
         app_data_->set_process(application_data::LOAD_MESH);
         app_data_->set_file_name(file_name);
         app_data_->start();
+        return;
     }
+
+    if( file_name.split(".").at(1) == "rgn" )
+    {
+        progress_bar_->show();
+        app_data_->set_process(application_data::LOAD_BOUNDARY);
+        app_data_->set_file_name(file_name);
+        app_data_->start();
+        return;
+    }
+
+    QMessageBox::warning(0, "Open file dialog", "Unsupported file type");
+}
+
+void MainWindow::show_message_box(QString msg)
+{
+    QMessageBox::warning(0, "Main application warning", msg);
 }
