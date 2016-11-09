@@ -72,7 +72,7 @@ void gl_mesh_widget::initializeGL()
 {
     this->initializeOpenGLFunctions();
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(1.0f, 0.7f, 0.8f, 1.0f);
 
     program_->addShaderFromSourceFile(QOpenGLShader::Vertex,":/Shaders/vector_shader");
     program_->addShaderFromSourceFile(QOpenGLShader::Fragment,":/Shaders/fragment_shader");
